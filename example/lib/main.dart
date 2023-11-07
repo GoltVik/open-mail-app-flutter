@@ -45,6 +45,30 @@ class MyApp extends StatelessWidget {
               },
             ),
             ElevatedButton(
+              child: Text("Open Default Mail App"),
+              onPressed: () async {
+                // Android: Will open mail app or show native picker.
+                // iOS: Will open mail app if single mail app found.
+                var result = await OpenMailApp.openDefaultMailApp();
+
+                // If no mail apps found, show error
+                if (!result.didOpen && !result.canOpen) {
+                  showNoMailAppsDialog(context);
+
+                  // iOS: if multiple mail apps found, show dialog to select.
+                  // There is no native intent/default app system in iOS so
+                  // you have to do it yourself.
+                } else if (!result.didOpen && result.canOpen) {
+                  showDialog(
+                    context: context,
+                    builder: (_) => MailAppPickerDialog(
+                      mailApps: result.options,
+                    ),
+                  );
+                }
+              },
+            ),
+            ElevatedButton(
               child: Text('Open mail app, with email already composed'),
               onPressed: () async {
                 EmailContent email = EmailContent(

@@ -142,6 +142,23 @@ class OpenMailApp {
     }
   }
 
+  static Future<OpenMailAppResult> openDefaultMailApp() async {
+    if (_isAndroid) {
+      final result =
+          await _channel.invokeMethod<bool>('openDefaultMailApp') ?? false;
+      return OpenMailAppResult(didOpen: result);
+    } else if (_isIOS) {
+      try {
+        await launch('message://', forceSafariVC: false);
+        return OpenMailAppResult(didOpen: true);
+      } catch (e) {
+        return OpenMailAppResult(didOpen: false);
+      }
+    } else {
+      throw Exception('Platform not supported');
+    }
+  }
+
   /// Allows you to open a mail application installed on the user's device
   /// and start composing a new email with the contents in [emailContent].
   ///
